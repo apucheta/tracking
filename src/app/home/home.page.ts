@@ -62,31 +62,33 @@ export class HomePage {
         );
       }
     });
+    
   }
 
   stopTracking(){
     Geolocation.clearWatch({id: this.watch }).then(()=>{
       this.isTracking = false;
     });
+    this.updateMap(this.lugares);
   }
 
-  addNewLocation(lat,lng,timestamp){
-    console.log('lat:'+lat );
-    console.log('lng:'+lng);
-    console.log('timestamp: '+timestamp);
+  addNewLocation(latitud,long,ts){
+    /* console.log('lat:'+latitud );
+    console.log('lng:'+long);
+    console.log('timestamp: '+ts); */
     
-    
-    
-    let elemento: location;
+    /* let elemento: location;
     elemento.lat = lat;
     elemento.lng = lng;
     elemento.timestamp = timestamp;
-    this.lugares.push(elemento);
-    console.log(this.lugares);
+    console.log(elemento); */
     
-    let position = new google.maps.LatLng(lat, lng);
+    this.lugares.push({lat:latitud,lng: long, timestamp: ts});
+    //console.log(this.lugares);
+    
+    let position = new google.maps.LatLng(latitud, long);
     this.map.setCenter(position);
-    this.map.setZoom(5);
+    this.map.setZoom(15);
   }
 
   updateMap(locations){
@@ -94,6 +96,8 @@ export class HomePage {
     this.markers = [];
 
     for (let location of locations) {
+      console.log(location);
+      
       let latLng = new google.maps.LatLng(location.lat, location.lng);
    
       let marker = new google.maps.Marker({
