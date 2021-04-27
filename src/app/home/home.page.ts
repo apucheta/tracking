@@ -19,15 +19,16 @@ interface location {
 export class HomePage {
   lugares: Array<location> = [
     {
-      lat: -34.5677206,
-      lng: -58.451593100000004,
+      lat: -34.77627, 
+      lng: -58.910965,
       timestamp: 1619470383829,
     },
   ];
+  distancia: string = '';
 
   isTracking = false;
   watch: string
-  
+  currentMapTrack=null;
   //setting map & markers
   @ViewChild('map',{static: true}) mapElement: ElementRef;
   map: any;
@@ -41,10 +42,10 @@ export class HomePage {
   }
 
   loadMap(){
-    let latLng= new google.maps.LatLng(51.9036442, 7.6673267);
+    let latLng= new google.maps.LatLng(-34.77627, -58.910965);
     let mapOptions = {
       center: latLng,
-      zoom: 5,
+      zoom: 10,
       mapTypeId: google.maps.MapTypeId.ROADMAP
     };
 
@@ -72,23 +73,13 @@ export class HomePage {
     this.updateMap(this.lugares);
   }
 
-  addNewLocation(latitud,long,ts){
-    /* console.log('lat:'+latitud );
-    console.log('lng:'+long);
-    console.log('timestamp: '+ts); */
-    
-    /* let elemento: location;
-    elemento.lat = lat;
-    elemento.lng = lng;
-    elemento.timestamp = timestamp;
-    console.log(elemento); */
-    
+  addNewLocation(latitud,long,ts){    
     this.lugares.push({lat:latitud,lng: long, timestamp: ts});
     //console.log(this.lugares);
     
     let position = new google.maps.LatLng(latitud, long);
     this.map.setCenter(position);
-    this.map.setZoom(15);
+    this.map.setZoom(8);
   }
 
   updateMap(locations){
@@ -96,10 +87,11 @@ export class HomePage {
     this.markers = [];
 
     for (let location of locations) {
-      console.log(location);
+      //console.log(location);
       
       let latLng = new google.maps.LatLng(location.lat, location.lng);
-   
+      //console.log(latLng);
+      
       let marker = new google.maps.Marker({
         map: this.map,
         animation: google.maps.Animation.DROP,
@@ -107,5 +99,47 @@ export class HomePage {
       });
       this.markers.push(marker);
     }
+    this.redrawPath(locations)
+  }
+
+  redrawPath(path) {
+    //console.log(path[0]);
+    if (this.currentMapTrack) {
+      this.currentMapTrack.setMap(null);
+    }
+ 
+    if (path.length > 1) {
+      this.currentMapTrack = new google.maps.Polyline({
+        path: path,
+        geodesic: true,
+        strokeColor: '#0011ff',
+        strokeOpacity: 1.0,
+        strokeWeight: 3
+      });
+      this.currentMapTrack.setMap(this.map);
+    }
+    
+    this.calDistance(path[0],path[path.length-1]);
+  }
+
+  calDistance(origen, destino){
+    // calculo la distancia entre los puntos
+    //const geocoder = new google.maps.Geocoder();
+
+    const service = new google.maps.DistanceMatrixService();
+    service.getDistanceMatrix({
+      origins: [origen],
+      destinations: [destino],
+      travelMode: google.maps.TravelMode.WALKING,
+      unitSystem: google.maps.UnitSystem.METRIC,
+      avoidHighways: false,
+      avoidTolls: false,
+      },(response, status) => {
+        if (status !== "OK") {
+          alert("Error was: " + status);
+        }else{
+          this.distancia = response.rows[0]['elements'][0]['distance'].text;
+        }
+      });
   }
 }

@@ -10,21 +10,22 @@
   <div #map id="map"></div>
 
   <ion-item>
-    <ion-label>Persona</ion-label>
+    <ion-label *ngIf="distancia !== ''">Distancia al hoyo: {{distancia}}</ion-label>
+    <ion-label *ngIf="distancia == ''">Actualiza tu ubicacion</ion-label>
   </ion-item>
 
   <ion-button (click)="startTracking()" expand="block" shape="round" *ngIf="!isTracking">
     <ion-icon slot="start" name="locate"></ion-icon>
-    Start Tracking
+    Actualizar ubicacion.
   </ion-button>
 
   <ion-button (click)="stopTracking()" expand="block" shape="round" *ngIf="isTracking">
     <ion-icon slot="start" name="hand-left-outline"></ion-icon>
-    Stop Tracking
+    Dejar de actualizar.
   </ion-button>
 
-  <ion-list>
-    <ion-item-sliding *ngFor="let pos of locations | async">
+  <!-- <ion-list>
+    <ion-item-sliding *ngFor="let pos of lugares | async">
       <ion-item>
         <ion-label text-wrap>
           Lat: {{ pos.lat }}
@@ -42,6 +43,6 @@
       </ion-item-options>
 
     </ion-item-sliding>
-  </ion-list>
+  </ion-list> -->
 
 </ion-content>
